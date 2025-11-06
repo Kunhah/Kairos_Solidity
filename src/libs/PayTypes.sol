@@ -13,6 +13,7 @@ library PayTypes {
     struct Swap {
         SwapStep[] swapSteps;
         address sender;
+        bool isFlat;
         uint256 amount;
     }
 
