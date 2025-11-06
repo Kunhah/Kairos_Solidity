@@ -13,12 +13,12 @@ import { PayTypes } from "./libs/PayTypes.sol";
 import { AggregatorV3Interface } from "./interfaces/AggregatorV3Interface.sol";
 import { ReferralSystem } from "./Referral.sol";
 
-contract Swap is ISwap, ReferralSystem {
+contract SwapPerformance is ISwap, ReferralSystem {
     using SafeERC20 for IERC20;
 
     address public constant ProtocolAddress = address(0x0000000000000000000000000000000000000000);
 
-    uint256 public constant FEE_BPS = 9_700; // 0.97%
+    uint256 public constant FEE_BPS = 97_000; // 0.97%
     uint256 public constant FEE_FLAT = 970; // 0.097%
     uint256 public constant BPS_DIVISOR = 1_000_000;
 
@@ -63,7 +63,7 @@ contract Swap is ISwap, ReferralSystem {
         AggregatorV3Interface aggregatorIn = PolygonChainlink.getPriceFeedAddress(PolygonChainlink.ADDRESS_USDC, swap.swapSteps[0].tokenIn);
         uint256 usdValueBefore = swap.swapSteps[0].tokenIn.balanceOf(swap.sender) * aggregatorIn.latestRoundData();
 
-        uint256 fee = (amount * FEE_FLAT) / BPS_DIVISOR;
+        //uint256 fee = (amount * FEE_FLAT) / BPS_DIVISOR;
 
         if (swap.swapSteps.length == 1) {
             bool success = IERC20(swap.swapSteps[0].tokenIn).trySafeTransferFrom(swap.sender, address(this), amount);
@@ -123,24 +123,17 @@ contract Swap is ISwap, ReferralSystem {
                 }
             }
 
-            // AggregatorV3Interface aggregatorOut = PolygonChainlink.getPriceFeedAddress(PolygonChainlink.ADDRESS_USDC, swap.swapSteps[swap.swapSteps.length - 1].tokenOut);
-            // uint256 usdValueAfter = swap.swapSteps[swap.swapSteps.length - 1].tokenOut.balanceOf(swap.sender) * aggregatorOut.latestRoundData();
+            AggregatorV3Interface aggregatorOut = PolygonChainlink.getPriceFeedAddress(PolygonChainlink.ADDRESS_USDC, swap.swapSteps[swap.swapSteps.length - 1].tokenOut);
+            uint256 usdValueAfter = swap.swapSteps[swap.swapSteps.length - 1].tokenOut.balanceOf(swap.sender) * aggregatorOut.latestRoundData();
 
-            // uint256 fee = ((usdValueAfter - usdValueBefore) * FEE_BPS / BPS_DIVISOR) / aggregatorOut.latestRoundData();
+            uint256 fee = ((usdValueAfter - usdValueBefore) * FEE_BPS / BPS_DIVISOR) / aggregatorOut.latestRoundData(); // CONVERSION IS NEEDED
 
-            if (referrals[swap.sender].referrer != address(0)) {
-                unclaimedFee[swap.sender][tokenOut] += fee;
-            }
+            uint256 distributedAmount = distributeReferralRewards(ProtocolAddress, tokenOut,)
 
-            swap.swapSteps[swap.swapSteps.length - 1].tokenOut.safeTransferFrom(swap.sender, ProtocolAddress, fee);
+            swap.swapSteps[swap.swapSteps.length - 1].tokenOut.safeTransferFrom(swap.sender, ProtocolAddress, fee - distributedAmount);
 
             return true;
         }
-    }
-
-    function claimFee(address user, address token)  returns () {
-        uint256 distributedAmount = distributeReferralRewards(ProtocolAddress, token, unclaimedFee[swap.sender][token]);
-        unclaimedFee[swap.sender][token] = 0;
     }
 
     /**
