@@ -9,20 +9,14 @@ import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/Mes
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { SwapTokens } from "./libs/SwapTokens.sol";
 import { PayTypes } from "./libs/PayTypes.sol";
+import { AggregatorV3Interface } from "./interfaces/AggregatorV3Interface.sol";
 import { ReferralSystem } from "./Referral.sol";
-import { PolygonChainlink } from "./PolygonChainlink.sol";
 
-contract Swap is ReferralSystem {
+contract SwapNoFee is ReferralSystem {
     using SafeERC20 for IERC20;
 
     address public constant ProtocolAddress = address(0x0000000000000000000000000000000000000000);
-
-    uint256 public constant FEE_FLAT = 9_700; // 0.97%
-    uint256 public constant BPS_DIVISOR = 1_000_000;
-
-    //mapping(address => mapping(address => uint256)) unclaimedFee; // user => token => amount
-    mapping(address => mapping(address => uint256)) public referralRewards; // another which would be that the referrer address gets stored
-
+    
     /**
     * @dev Constructor
     */
@@ -83,7 +77,7 @@ contract Swap is ReferralSystem {
                     return false;
                 }
 
-                
+
             }
         } else {
             bool success = IERC20(swap.swapSteps[0].tokenIn).trySafeTransferFrom(swap.sender, address(this), amount);
@@ -114,38 +108,9 @@ contract Swap is ReferralSystem {
                     }
                 }
             }
-
         }
-        uint256 fee = (amount * FEE_FLAT) / BPS_DIVISOR;
-
-        if (referrals[swap.sender] != address(0)) {
-            referralRewards[swap.sender][swap.swapSteps[swap.swapSteps.length - 1].tokenOut] += fee;
-        }
-
-        IERC20(swap.swapSteps[swap.swapSteps.length - 1].tokenOut).safeTransferFrom(swap.sender, ProtocolAddress, fee);
 
         return true;
-    }
-
-    function convertReferralRewardsToUSDT(address user, address[] calldata tokens) external returns (uint256 distributedAmount) {
-        for (uint256 i = 0; i < tokens.length; i++) {
-
-            IERC20(tokens[i]).safeTransferFrom(ProtocolAddress, address(this), referralRewards[user][tokens[i]]);
-
-            if (tokens[i] == PolygonChainlink.ADDRESS_USDT) {
-
-                distributedAmount = distributeReferralRewards(user, PolygonChainlink.ADDRESS_USDT, referralRewards[user][tokens[i]]);
-            }
-            else {
-
-                (, uint256 amountOut) = SwapTokens.UniswapV3(tokens[i], PolygonChainlink.ADDRESS_USDT, referralRewards[user][tokens[i]], ProtocolAddress);
-                distributedAmount = distributeReferralRewards(ProtocolAddress, PolygonChainlink.ADDRESS_USDT, amountOut);
-            }
-
-            referralRewards[user][tokens[i]] = 0;
-        }
-
-        IERC20(PolygonChainlink.ADDRESS_USDT).safeTransfer(ProtocolAddress, IERC20(PolygonChainlink.ADDRESS_USDT).balanceOf(address(this)));
     }
 
     /**

@@ -176,9 +176,9 @@
 //             return SwapTokens.Pancakeswap(tokenIn, tokenOut, amountIn, receiver);
 //         }
 //         else if (dex == PayTypes.DEX.Curve) {
-//             address pool = abi.decode(extraData, (address));
-//             return SwapTokens.Curve(pool, tokenIn, tokenOut, amountIn, receiver);
-//         }
+//            (int128 i, int128 j, address pool) = abi.decode(extraData, (address));
+//            return SwapTokens.Curve(i, j, pool, tokenIn, tokenOut, amountIn, receiver);
+//        }
 //         else {
 //             revert PayTypes.UnsupportedDEX(dex);
 //         }

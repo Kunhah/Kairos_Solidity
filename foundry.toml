@@ -3,7 +3,15 @@ src = "src"
 out = "out"
 libs = ["lib"]
 
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+remappings = [
+  "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+  "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/",
+  "@uniswap/v4-core/src/=lib/v4-core/src/",
+  "@uniswap/v3-core/contracts/=lib/v3-core/contracts/",
+  "@uniswap/v3-periphery/contracts/=lib/v3-periphery/contracts/",
+  "@uniswap/v2-periphery/contracts/=lib/v2-periphery/contracts/",
+  "forge-std/=lib/forge-std/src/"
+]
 
-[remappings]
-"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

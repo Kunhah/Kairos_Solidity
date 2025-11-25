@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.19 <0.9.0;
 
-import { AggregatorV3Interface } from "../Interfaces/AggregatorV3Interface.sol";
+import { AggregatorV3Interface } from "./interfaces/AggregatorV3Interface.sol";
 
 library PolygonChainlink {
 
@@ -12,6 +12,7 @@ library PolygonChainlink {
     address constant ADDRESS_wBTC = 0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6;
     address constant ADDRESS_wETH = 0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619;
     address constant ADDRESS_USDC = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
+    address constant ADDRESS_USDT = 0xc2132D05D31c914a87C6611C10748AEb04B58e8F;
     address constant ADDRESS_SHIB = 0x6f8a06447Ff6FcF75d803135a7de15CE88C1d4ec;
     address constant ADDRESS_APE = 0xB7b31a6BC18e48888545CE79e83E06003bE70930;
     address constant ADDRESS_PAXG = 0x553d3D295e0f695B9228246232eDF400ed3560B5;

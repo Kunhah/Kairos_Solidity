@@ -13,7 +13,6 @@ library PayTypes {
     struct Swap {
         SwapStep[] swapSteps;
         address sender;
-        bool isFlat;
         uint256 amount;
     }
 
@@ -47,6 +46,7 @@ library PayTypes {
         UniswapV2,
         UniswapV3,
         Sushiswap,
+        QuickSwap,
         Pancakeswap,
         Curve,
         Balancer,
